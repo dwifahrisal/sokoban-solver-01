@@ -1,47 +1,47 @@
-const F=require('fs'),E=process.env,I=E.MAKEFUN_INPUT_DIR||'/input',O=E.MAKEFUN_OUTPUT_DIR||'/output';
+const F=require('node:fs'),E=process.env,I=E.MAKEFUN_INPUT_DIR||'/input',O=E.MAKEFUN_OUTPUT_DIR||'/output';
 for(const id of F.readdirSync(I)){
-const R=F.readFileSync(I+'/'+id+'/level.txt').toString().split('\n');
-const w=Math.max(...R.map(s=>s.length)),N=w*R.length,D=[-w,w,-1,1];
-const W=new Uint8Array(N),GM=new Uint8Array(N),B=[];let P=0;
-R.forEach((s,y)=>[...s].forEach((c,x)=>{const i=y*w+x;W[i]=c=='#'?0:1;
-if('.+*'.includes(c))GM[i]=1;if('$*'.includes(c))B.push(i);if('@+'.includes(c))P=i;}));
-const hr=P/w|0,rid=i=>2*(((i%w)-1)/7|0)+((i/w|0)>hr),RM=[],FIN=[];
-for(const b of B)(RM[rid(b)]??=[]).push(b);
+const L=F.readFileSync(I+'/'+id+'/level.txt').toString().split('\n');
+const w=Math.max(...L.map(s=>s.length)),n=w*L.length,D=[-w,w,-1,1];
+const W=new Uint8Array(n),G=new Uint8Array(n),B=[];let P=0;
+L.forEach((s,y)=>[...s].forEach((c,x)=>{const i=y*w+x;W[i]=c=='#'?0:1;
+if('.+*'.includes(c))G[i]=1;if('$*'.includes(c))B.push(i);if('@+'.includes(c))P=i;}));
+const hr=P/w|0,rg=i=>2*(((i%w)-1)/7|0)+((i/w|0)>hr),M=[],X=[];
+for(const b of B)(M[rg(b)]??=[]).push(b);
 let mv='',pl=P;
-RM.forEach((rm,ri)=>{
+M.forEach((rm,ri)=>{
 if(!rm)return;
-const w2=W.slice();
-RM.forEach((r,k)=>{if(k!=ri&&r)for(const c of (FIN[k]||r))w2[c]=0;});
-const Z=new Int32Array(4*N),occ=new Uint8Array(N);
-const fl=(f,o,s)=>{let lo=f;const st=[f];Z[o+f]=s;
-while(st.length){const p=st.pop();if(p<lo)lo=p;for(let k=0;k<4;k++){const r=p+D[k];
-if(w2[r]&&!occ[r]&&Z[o+r]!=s){Z[o+r]=s;Z[o+N+r]=p;Z[o+2*N+r]=k;st.push(r);}}}return lo;};
-const key=(nb,lo)=>{let k=lo;for(const b of nb)k=k*N+b;return k;};
-const bx=rm,Q=[[bx,pl,'']],ix=new Map();let tm=1;
-for(const b of bx)occ[b]=1;ix.set(key(bx,fl(pl,0,++tm)),0);for(const b of bx)occ[b]=0;
+const f=W.slice();
+M.forEach((r,k)=>{if(k!=ri&&r)for(const c of (X[k]||r))f[c]=0;});
+const Z=new Int32Array(4*n),C=new Uint8Array(n);
+const tg=(bs,v)=>{for(const b of bs)C[b]=v;};
+const fl=(s,o,g)=>{let lo=s;const st=[s];Z[o+s]=g;
+while(st.length){const p=st.pop();if(p<lo)lo=p;for(let k=0;k<4;k++){const q=p+D[k];
+if(f[q]&&!C[q]&&Z[o+q]!=g){Z[o+q]=g;Z[o+n+q]=p;Z[o+2*n+q]=k;st.push(q);}}}return lo;};
+const ky=(bs,lo)=>bs.reduce((h,b)=>h*n+b,lo);
+const Q=[[rm,pl,'']],ix=new Map();let tm=1;
+tg(rm,1);ix.set(ky(rm,fl(pl,0,++tm)),0);tg(rm,0);
 let fd=-1;
 for(let hd=0;fd<0&&hd<Q.length;hd++){
-const bs=Q[hd][0],pp=Q[hd][1];
-for(const b of bs)occ[b]=1;
+const[bs,pp]=Q[hd];
+tg(bs,1);
 const s=++tm;fl(pp,0,s);
 for(let i=0;i<bs.length&&fd<0;i++){
 for(let k=0;k<4;k++){
 const d=D[k],b=bs[i],tt=b+d,stn=b-d;
-if(Z[stn]!=s||!w2[tt]||occ[tt])continue;
+if(Z[stn]!=s||!f[tt]||C[tt])continue;
 let wk='';
-for(let p=stn;p!=pp;p=Z[N+p])wk='udlr'[Z[2*N+p]]+wk;
-occ[b]=0;occ[tt]=1;
+for(let p=stn;p!=pp;p=Z[n+p])wk='udlr'[Z[2*n+p]]+wk;
+C[b]=0;C[tt]=1;
 const nb=bs.slice();nb[i]=tt;nb.sort((a,b)=>a-b);
-const kk=key(nb,fl(b,3*N,++tm));
-occ[tt]=0;occ[b]=1;
+const kk=ky(nb,fl(b,3*n,++tm));
+C[tt]=0;C[b]=1;
 if(ix.has(kk))continue;
 ix.set(kk,Q.length);Q.push([nb,b,Q[hd][2]+wk+'UDLR'[k]]);
-if(nb.every(x=>GM[x])){fd=Q.length-1;break;}
-}
-}
-for(const b of bs)occ[b]=0;
+if(nb.every(x=>G[x])){fd=Q.length-1;break;}
+}}
+tg(bs,0);
 }
 if(fd<0)return;
-const q=Q[fd];mv+=q[2];pl=q[1];FIN[ri]=q[0];});
+const q=Q[fd];mv+=q[2];pl=q[1];X[ri]=q[0];});
 F.mkdirSync(O+'/'+id,{recursive:true});F.writeFileSync(O+'/'+id+'/solution.txt',mv);
 }
